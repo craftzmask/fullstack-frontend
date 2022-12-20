@@ -40,6 +40,12 @@ const App = () => {
             setNewName('')
             setNewNumber('')
           })
+          .catch(() => {
+            createNotification(`${person.name} has already been removed from server`, 'error')
+            setNewName('')
+            setNewNumber('')
+            setPersons(persons.filter(p => p.id !== person.id))
+          })
       }
     } else {
       const personObject = { 
@@ -88,7 +94,7 @@ const App = () => {
     setTimeout(() => {
       setMessage('')
       setMessageType('')
-    }, 2000)
+    }, 5000)
   }
 
   return (
