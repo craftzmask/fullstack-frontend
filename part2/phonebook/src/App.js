@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
+import Notification from './components/Notification'
 import personService from './services/persons'
 
 const App = () => {
@@ -9,6 +10,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [query, setQuery] = useState('')
+  const [message, setMessage] = useState('')
+  const [messageType, setMessageType] = useState('')
 
   useEffect(() => {
     personService
@@ -30,6 +33,9 @@ const App = () => {
         personService
           .update(person.id, { ...person, number: newNumber })
           .then(updatedPerson => {
+            createNotification(
+              `Updated the number of ${updatedPerson.name}`, 'success'
+            )
             setPersons(persons.map(p => p.id !== person.id ? p : updatedPerson))
             setNewName('')
             setNewNumber('')
@@ -43,6 +49,7 @@ const App = () => {
 
       personService.create(personObject)
         .then(returnedPerson => {
+          createNotification(`Added ${returnedPerson.name}`, 'success')
           setPersons(persons.concat(returnedPerson))
           setNewName('')
           setNewNumber('')
@@ -64,16 +71,35 @@ const App = () => {
 
   const handleDeleteButtonClick = id => {
     const person = persons.find(p => p.id === id)
+
     if (window.confirm(`Delete ${person.name}?`)) {
       personService
         .remove(id)
-        .then(() => setPersons(persons.filter(p => p.id !== id)))
+        .then(() => {
+          createNotification(`Deleted ${person.name}`, 'success')
+          setPersons(persons.filter(p => p.id !== id))
+        })
     }
+  }
+
+  const createNotification = (message, messageType) => {
+    setMessage(message)
+    setMessageType(messageType)
+    setTimeout(() => {
+      setMessage('')
+      setMessageType('')
+    }, 2000)
   }
 
   return (
     <div>
       <h2>Phonebook</h2>
+
+      <Notification 
+        message={message}
+        messageType={messageType}
+      />
+
       <Filter 
         query={query}
         onQueryChange={handleQueryChange}
