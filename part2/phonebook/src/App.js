@@ -23,10 +23,18 @@ const App = () => {
   const handleFormSubmit = event => {
     event.preventDefault()
 
-    const isNameExisted = persons.find(p => p.name === newName)
+    const person = persons.find(p => p.name === newName)
 
-    if (isNameExisted) {
-      alert(`${newName} is already added to phonebook`)
+    if (person) {
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        personService
+          .update(person.id, { ...person, number: newNumber })
+          .then(updatedPerson => {
+            setPersons(persons.map(p => p.id !== person.id ? p : updatedPerson))
+            setNewName('')
+            setNewNumber('')
+          })
+      }
     } else {
       const personObject = { 
         name: newName,
