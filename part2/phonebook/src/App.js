@@ -45,7 +45,11 @@ const App = () => {
             createNotification(message, 'error')
             setNewName('')
             setNewNumber('')
-            setPersons(persons.filter(p => p.id !== person.id))
+
+            // Remove the non-existing person
+            if (!persons.find(p => p.id === person.id)) {
+              setPersons(persons.filter(p => p.id !== person.id)) 
+            }
           })
       }
     } else {
