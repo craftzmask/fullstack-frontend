@@ -40,8 +40,9 @@ const App = () => {
             setNewName('')
             setNewNumber('')
           })
-          .catch(() => {
-            createNotification(`${person.name} has already been removed from server`, 'error')
+          .catch(err => {
+            const message = err.response.data.err
+            createNotification(message, 'error')
             setNewName('')
             setNewNumber('')
             setPersons(persons.filter(p => p.id !== person.id))
@@ -59,6 +60,10 @@ const App = () => {
           setPersons(persons.concat(returnedPerson))
           setNewName('')
           setNewNumber('')
+        })
+        .catch(err => {
+          const message = err.response.data.err
+          createNotification(message, 'error')
         })
     }
   }
