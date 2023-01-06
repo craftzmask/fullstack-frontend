@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
+import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -11,6 +12,8 @@ const App = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
+  const [message, setMessage] = useState('')
+  const [messageType, setMessageType] = useState('')
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -44,13 +47,15 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
+      createNotification('Logged in successfull', 'success')
     } catch (exception) {
-      console.error(exception)
+      createNotification('Invalid username or password', 'error')
     }
   }
 
   const handleLogout = () => {
     localStorage.clear()
+    createNotification('Log out successful', 'success')
     setUser(null)
   }
 
@@ -66,16 +71,37 @@ const App = () => {
       setTitle('')
       setAuthor('')
       setUrl('')
+      createNotification(
+        `${savedBlog.title} by ${savedBlog.author} added`,
+        'success'
+      )
     } catch (exception) {
-      console.error(exception)
+      createNotification(
+        'A blog must contain title, author and url',
+        'error'
+      )
     }
 
+  }
+
+  const createNotification = (message, messageType) => {
+    setMessage(message)
+    setMessageType(messageType)
+
+    setTimeout(() => {
+      setMessage('')
+      setMessageType('')
+    }, 5000)
   }
 
   if (user === null) {
     return (
       <div>
         <h2>log in to application</h2>
+        <Notification 
+          message={message}
+          messageType={messageType}
+        />
         <form onSubmit={handleLogin}>
           <div>
             username <input 
@@ -137,6 +163,10 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
+      <Notification 
+        message={message}
+        messageType={messageType}
+      />
       <p>
         {user.name} logged in 
         <button onClick={handleLogout}>logout</button>
